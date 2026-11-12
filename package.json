@@ -1,0 +1,21 @@
+{
+  "name": "mcp-ocei-oracle",
+  "version": "2.2.0",
+  "description": "Official Model Context Protocol (MCP) server for the OCEI v2.2 (Orbital Compute Efficiency Index) physics, space-weather, and $/MTok arbitrage oracle.",
+  "homepage": "https://orbitcompute.ai",
+  "type": "module",
+  "main": "index.mjs",
+  "bin": {
+    "mcp-ocei-oracle": "./index.mjs"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "orbital-compute",
+    "ocei",
+    "space-weather",
+    "ai-infrastructure",
+    "tco-oracle"
+  ],
+  "license": "MIT"
+}
