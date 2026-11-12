@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+title: "OCEI v2.2: Orbital Compute Efficiency Index — Deterministic Thermodynamic, Radiative & Arbitrage Reference Model"
+message: "If you use the OCEI v2.2 benchmark standard or MCP oracle in your research or systems, please cite it using this metadata."
+type: software
+authors:
+  - name: "Spatial Compute Holdings // OrbitCompute Data Consortium"
+    website: "https://orbitcompute.ai"
+version: 2.2.0
+date-released: 2026-11-12
+url: "https://orbitcompute.ai/ocei"
+repository-code: "https://github.com/Mr-Didi/mcp-ocei-oracle"
+license: MIT
+keywords:
+  - orbital-compute
+  - ocei
+  - space-weather
+  - ai-infrastructure
+  - model-context-protocol
