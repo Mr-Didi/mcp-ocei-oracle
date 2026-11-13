@@ -1,20 +1,25 @@
 # OCEI™ v2.2 — Orbital Compute Efficiency Index & Arbitrage Oracle (MCP Server)
 
 [![OCEI v2.2 Live Benchmark](https://orbitcompute.ai/v1/index/ocei/badge.svg)](https://orbitcompute.ai/ocei)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24181722.svg)](https://doi.org/10.5281/zenodo.24181722)
 
 Official **Model Context Protocol (MCP)** server and deterministic reference client for **[OrbitCompute.ai](https://orbitcompute.ai)**, publisher of the **OCEI™ v2.2 (Orbital Compute Efficiency Index)**.
+
+* **Published Reference Specification (CERN / Zenodo DOI):** https://doi.org/10.5281/zenodo.24181722
+* **Official MCP Registry ID:** `io.github.Mr-Didi/mcp-ocei-oracle`
 
 Provides cryptographically attested (**RFC 8785 JSON Canonicalization + ECDSA P-256 `ES256`**) real-time evaluations comparing orbital AI compute shells (**650 km Dawn-Dusk SSO**, **320 km VLEO Edge**, **550 km LEO**, **1,500 km MEO**) against **Terrestrial Tier-IV Utility Grids** using 6 live **NOAA SWPC & GOES satellite telemetry streams**.
 
 ## Live Specification & Endpoints
 
-- **Interactive Control Room & Multi-Physics Simulator:** [https://orbitcompute.ai](https://orbitcompute.ai)
-- **Formal Mathematical Specification & CODATA Registry:** [https://orbitcompute.ai/ocei](https://orbitcompute.ai/ocei)
-- **Token-Optimized Markdown Spec (for LLMs):** [https://orbitcompute.ai/ocei.md](https://orbitcompute.ai/ocei.md)
-- **Live Attested JSON Feed:** [https://orbitcompute.ai/v1/index/ocei](https://orbitcompute.ai/v1/index/ocei)
-- **Ultra-Compact M2M Feed (<160 Tokens):** [https://orbitcompute.ai/v1/index/ocei?format=compact](https://orbitcompute.ai/v1/index/ocei?format=compact)
-- **Global Verification Public Key (JWKS):** [https://orbitcompute.ai/.well-known/jwks.json](https://orbitcompute.ai/.well-known/jwks.json)
-- **OpenAPI 3.1.0 Specification:** [https://orbitcompute.ai/v1/openapi.json](https://orbitcompute.ai/v1/openapi.json)
+- **Interactive Control Room & Multi-Physics Simulator:** https://orbitcompute.ai
+- **Formal Mathematical Specification & CODATA Registry:** https://orbitcompute.ai/ocei
+- **CERN / Zenodo Archival PDF (DOI: 10.5281/zenodo.24181722):** https://doi.org/10.5281/zenodo.24181722
+- **Token-Optimized Markdown Spec (for LLMs):** https://orbitcompute.ai/ocei.md
+- **Live Attested JSON Feed:** https://orbitcompute.ai/v1/index/ocei
+- **Ultra-Compact M2M Feed (<160 Tokens):** https://orbitcompute.ai/v1/index/ocei?format=compact
+- **Global Verification Public Key (JWKS):** https://orbitcompute.ai/.well-known/jwks.json
+- **OpenAPI 3.1.0 Specification:** https://orbitcompute.ai/v1/openapi.json
 
 ## Exposed MCP Tools
 
@@ -29,16 +34,25 @@ Provides cryptographically attested (**RFC 8785 JSON Canonicalization + ECDSA P-
     {
       "mcpServers": {
         "ocei-oracle": {
-          "url": "[https://orbitcompute.ai/mcp](https://orbitcompute.ai/mcp)"
+          "url": "https://orbitcompute.ai/mcp"
         }
       }
     }
 
 ### Option B: Local Docker / Node.js Bridge
 
-    git clone [https://github.com/Mr-Didi/mcp-ocei-oracle.git](https://github.com/Mr-Didi/mcp-ocei-oracle.git)
+    git clone https://github.com/Mr-Didi/mcp-ocei-oracle.git
     node mcp-ocei-oracle/index.mjs
 
-## Standard Citation
+## Academic & Industry Citation (DOI: 10.5281/zenodo.24181722)
 
-> Spatial Compute Holdings, "OCEI v2.2: Orbital Compute Efficiency Index — Deterministic Thermodynamic, Radiative & Arbitrage Reference Model," OrbitCompute.ai, 2026. Available: [https://orbitcompute.ai/ocei](https://orbitcompute.ai/ocei)
+> Spatial Compute Holdings, "OCEI v2.2: Orbital Compute Efficiency Index — Deterministic Thermodynamic, Radiative, Optical, and Token-Economic Reference Model," Zenodo, 2026. doi: 10.5281/zenodo.24181722. Available: https://doi.org/10.5281/zenodo.24181722
+
+    @techreport{ocei_v2_2_2026,
+      author      = {{Spatial Compute Holdings // OrbitCompute Data Consortium}},
+      title       = {{OCEI v2.2: Orbital Compute Efficiency Index — Deterministic Thermodynamic, Radiative, Optical, and Token-Economic Reference Model}},
+      institution = {OrbitCompute.ai},
+      year        = {2026},
+      doi         = {10.5281/zenodo.24181722},
+      url         = {https://doi.org/10.5281/zenodo.24181722}
+    }
