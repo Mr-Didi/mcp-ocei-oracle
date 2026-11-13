@@ -1,12 +1,17 @@
 cff-version: 1.2.0
-title: "OCEI v2.2: Orbital Compute Efficiency Index — Deterministic Thermodynamic, Radiative & Arbitrage Reference Model"
+title: "OCEI v2.2: Orbital Compute Efficiency Index — Deterministic Thermodynamic, Radiative, Optical, and Token-Economic Reference Model"
 message: "If you use the OCEI v2.2 benchmark standard or MCP oracle in your research or systems, please cite it using this metadata."
 type: software
 authors:
   - name: "Spatial Compute Holdings // OrbitCompute Data Consortium"
     website: "https://orbitcompute.ai"
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.24181722
+    description: "CERN / Zenodo Permanent Reference Specification DOI"
+doi: 10.5281/zenodo.24181722
 version: 2.2.0
-date-released: 2026-11-12
+date-released: 2026-11-13
 url: "https://orbitcompute.ai/ocei"
 repository-code: "https://github.com/Mr-Didi/mcp-ocei-oracle"
 license: MIT
