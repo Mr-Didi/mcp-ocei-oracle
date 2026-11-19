@@ -90,7 +90,7 @@ def _http_get_json(url: str, timeout: int = 15) -> dict[str, Any]:
     req = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "OCEI-Arbitrage-SDK/1.0 (+https://orbitcompute.ai)",
+            "User-Agent": "OCEI-Arbitrage-SDK/1.1 (+https://orbitcompute.ai)",
             "Accept": "application/json",
         },
     )
@@ -100,21 +100,6 @@ def _http_get_json(url: str, timeout: int = 15) -> dict[str, Any]:
 
 def _canonical_bytes(obj: Any) -> bytes:
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
-
-
-def _extract(payload: dict[str, Any], paths: list[list[str]], default: Any = None) -> Any:
-    for path in paths:
-        cur: Any = payload
-        ok = True
-        for k in path:
-            if isinstance(cur, dict) and k in cur:
-                cur = cur[k]
-            else:
-                ok = False
-                break
-        if ok and cur is not None:
-            return cur
-    return default
 
 
 class OCEIArbitrageRouter:
@@ -155,28 +140,24 @@ class OCEIArbitrageRouter:
 
     def verify_es256_attestation(self, payload: dict[str, Any]) -> dict[str, Any]:
         """
-        Checks presence of cryptographic proof and verifies ES256 if `cryptography` is installed.
-        Always returns deterministic SHA-256 digest of the received payload.
+        Verifies RFC-8785 / ECDSA P-256 (ES256) attestation against /.well-known/jwks.json
+        when `cryptography` is installed, and always returns the SHA-256 payload digest.
         """
-        digest = hashlib.sha256(_canonical_bytes(payload)).hexdigest()
-        sig_b64 = _extract(
-            payload,
-            [
-                ["attestation", "signature"],
-                ["cryptographic_proof", "signature"],
-                ["signature"],
-            ],
-        )
-        kid = _extract(
-            payload,
-            [
-                ["attestation", "kid"],
-                ["cryptographic_proof", "kid"],
-                ["kid"],
-            ],
-        )
+        att = payload.get("attestation") or {}
+        sig_b64 = att.get("signature")
+        key_id = att.get("key_id") or att.get("kid")
+        oracle_hash = att.get("state_hash_sha256")
+        unsigned = {k: v for k, v in payload.items() if k != "attestation"}
+        unsigned_bytes = _canonical_bytes(unsigned)
+        computed_unsigned_hash = hashlib.sha256(unsigned_bytes).hexdigest()
+        full_digest = hashlib.sha256(_canonical_bytes(payload)).hexdigest()
+
         if not sig_b64:
-            return {"verified": False, "reason": "no_signature_field", "payload_sha256": digest}
+            return {
+                "verified": False,
+                "reason": "no_signature_field",
+                "payload_sha256": full_digest,
+            }
 
         try:
             from cryptography.hazmat.primitives import hashes
@@ -185,11 +166,16 @@ class OCEIArbitrageRouter:
 
             jwks = self.fetch_jwks()
             key_dict = next(
-                (k for k in jwks.get("keys", []) if not kid or k.get("kid") == kid),
+                (k for k in jwks.get("keys", []) if not key_id or k.get("kid") == key_id),
                 (jwks.get("keys") or [None])[0],
             )
             if not key_dict:
-                return {"verified": False, "reason": "jwks_key_not_found", "payload_sha256": digest}
+                return {
+                    "verified": False,
+                    "reason": "jwks_key_not_found",
+                    "key_id": key_id,
+                    "payload_sha256": full_digest,
+                }
 
             def b64url_decode(val: str) -> bytes:
                 pad = "=" * (-len(val) % 4)
@@ -207,31 +193,45 @@ class OCEIArbitrageRouter:
             else:
                 der_sig = sig_bytes
 
-            # Reconstruct unsigned body (strip attestation/signature wrapper)
-            unsigned = {
-                k: v
-                for k, v in payload.items()
-                if k not in {"attestation", "cryptographic_proof", "signature"}
-            }
-            pub_key.verify(der_sig, _canonical_bytes(unsigned), ec.ECDSA(hashes.SHA256()))
+            verified = False
+            verified_mode = None
+            for mode, msg in (
+                ("canonical_unsigned_json", unsigned_bytes),
+                ("oracle_state_hash_hex", (oracle_hash or "").encode("utf-8")),
+            ):
+                if not msg:
+                    continue
+                try:
+                    pub_key.verify(der_sig, msg, ec.ECDSA(hashes.SHA256()))
+                    verified = True
+                    verified_mode = mode
+                    break
+                except Exception:
+                    continue
+
             return {
-                "verified": True,
-                "kid": key_dict.get("kid"),
-                "payload_sha256": digest,
+                "verified": verified,
+                "verified_mode": verified_mode,
+                "key_id": key_dict.get("kid"),
+                "oracle_state_hash_sha256": oracle_hash,
+                "computed_unsigned_sha256": computed_unsigned_hash,
+                "hash_matches_unsigned": (oracle_hash == computed_unsigned_hash) if oracle_hash else None,
+                "payload_sha256": full_digest,
             }
         except ImportError:
             return {
                 "verified": None,
                 "reason": "install `pip install cryptography` for local ECDSA P-256 verification",
-                "kid": kid,
-                "payload_sha256": digest,
+                "key_id": key_id,
+                "oracle_state_hash_sha256": oracle_hash,
+                "payload_sha256": full_digest,
             }
         except Exception as exc:
             return {
                 "verified": False,
-                "reason": f"signature_check_note:{exc}",
-                "kid": kid,
-                "payload_sha256": digest,
+                "reason": f"signature_check_error:{exc}",
+                "key_id": key_id,
+                "payload_sha256": full_digest,
             }
 
     def route(
@@ -246,20 +246,24 @@ class OCEIArbitrageRouter:
         attest = self.verify_es256_attestation(live)
         remote_solver = self.fetch_solver(workload=workload, grid_usd_mwh=grid_usd_mwh, power_mw=power_mw)
 
-        ocei_spot = float(
-            _extract(live, [["ocei_spot"], ["index", "ocei_spot"], ["scores", "spot"], ["score"]], 950.0)
-        )
-        ocei_struct = float(
-            _extract(
-                live,
-                [["ocei_structural"], ["index", "ocei_structural"], ["scores", "structural"]],
-                975.0,
-            )
-        )
-        space_weather_severe = ocei_spot < 650.0
-        grid_beats_orbit = grid_usd_mwh <= profile.breakeven_grid_usd_mwh
+        std = live.get("ocei_standard") or {}
+        multi = std.get("multi_regime_comparison") or {}
+        sw = live.get("space_weather_and_young_daly_checkpointing") or {}
 
-        if space_weather_severe:
+        ocei_spot = float(std.get("ocei_spot_realtime_score", 950.0))
+        ocei_struct = float(std.get("ocei_structural_5yr_score", 975.0))
+        ocei_twap = float(std.get("ocei_twap_60m_settlement_score", ocei_spot))
+        vleo_score = float((multi.get("vleo_320km_self_cleaning_edge") or {}).get("score", 940.0))
+        live_breakeven = (
+            float(std["breakeven_grid_usd_mwh"])
+            if stack == "rubin" and "breakeven_grid_usd_mwh" in std
+            else profile.breakeven_grid_usd_mwh
+        )
+
+        storm_trigger = bool(sw.get("pre_emptive_checkpoint_trigger", False)) or ocei_spot < 650.0
+        grid_beats_orbit = grid_usd_mwh <= live_breakeven
+
+        if storm_trigger:
             regime = "TERRESTRIAL_STORM_FAILOVER"
             split = {"orbit_sso_pct": 15, "orbit_vleo_pct": 0, "earth_spot_pct": 85}
         elif grid_beats_orbit:
@@ -282,9 +286,14 @@ class OCEIArbitrageRouter:
             "power_mw": power_mw,
             "nodes_required": nodes_required,
             "terrestrial_grid_usd_mwh": grid_usd_mwh,
-            "orbital_breakeven_usd_mwh": profile.breakeven_grid_usd_mwh,
+            "orbital_breakeven_usd_mwh": live_breakeven,
             "ocei_spot": ocei_spot,
             "ocei_structural": ocei_struct,
+            "ocei_twap_60m": ocei_twap,
+            "vleo_320km_score": vleo_score,
+            "oracle_dispatch_signal": std.get("arbitrage_dispatch_signal"),
+            "net_availability_pct": sw.get("net_effective_compute_availability_pct"),
+            "l1_lead_time_min": sw.get("l1_shockwave_lead_time_min"),
             "dispatch_regime": regime,
             "allocation_split_pct": split,
             "attestation": attest,
@@ -300,7 +309,8 @@ def render_skypilot_yaml(decision: dict[str, Any]) -> str:
     return f"""# Auto-generated by OCEI™ v2.2 Multi-Stack Arbitrage SDK (https://orbitcompute.ai)
 # DOI: {decision['doi']}
 # Timestamp: {decision['timestamp_utc']}
-# Live OCEI-Spot: {decision['ocei_spot']} | OCEI-Structural: {decision['ocei_structural']}
+# Live OCEI-Spot: {decision['ocei_spot']} | TWAP-60m: {decision['ocei_twap_60m']} | VLEO-320: {decision['vleo_320km_score']}
+# Young-Daly Availability: {decision['net_availability_pct']}% | L1 Lead: +{decision['l1_lead_time_min']}m
 # Terrestrial Grid: ${decision['terrestrial_grid_usd_mwh']}/MWh vs Breakeven: ${decision['orbital_breakeven_usd_mwh']}/MWh
 # Dispatch Regime: {regime}
 # Payload SHA-256: {decision['attestation']['payload_sha256']}
