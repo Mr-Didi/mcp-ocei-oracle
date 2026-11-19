@@ -1,0 +1,43 @@
+name: OCEI Hourly Cryptographic Ledger
+
+on:
+  schedule:
+    - cron: '5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ocei-ledger-commit
+  cancel-in-progress: false
+
+jobs:
+  snapshot-ocei:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch live OCEI state, verify chain & append ledger
+        run: python3 scripts/append_ledger.py
+
+      - name: Commit and push immutable ledger entry
+        run: |
+          if [ -n "$(git status --porcelain ledger/)" ]; then
+            git config user.name "ocei-ledger-bot[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add ledger/
+            TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            git commit -m "ledger(ocei): cryptographic snapshot ${TIMESTAMP}"
+            git push
+          else
+            echo "No ledger changes detected."
+          fi
