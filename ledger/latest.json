@@ -1,0 +1,24 @@
+{
+  "schema": "ocei.ledger.head.v1",
+  "sequence": 1,
+  "recorded_utc": "2026-11-19T18:19:09.719134Z",
+  "ledger_file": "ledger/2026-11.jsonl",
+  "prev_ledger_hash": "GENESIS_OCEI_V2_2_DOI_10_5281_ZENODO_24181722",
+  "ledger_entry_hash": "209cddf0527d70f5119ada240503f27a3e771df10ca0d1b55e5834c5716e0834",
+  "raw_payload_sha256": "e5cfb4c83dc8569b0dc9ada27fa63f80a3d57480c39ac628466e6377d1145e6d",
+  "jwks_kid": "ocei-es256-global-v2.2",
+  "summary": {
+    "ocei_spot": null,
+    "ocei_structural": null,
+    "ocei_twap_60m": null,
+    "dispatch_signal": null,
+    "rolling_24h_mean_spot": null,
+    "live_terrestrial_spot": {
+      "market": "EPEX_SPOT_DE_LU",
+      "source": "energy-charts.info",
+      "slot_utc": "2026-11-19T18:15:00+00:00",
+      "price_eur_mwh": 253.23
+    }
+  },
+  "rolling_24h_spot_window": []
+}
