@@ -2,7 +2,7 @@
 """
 OCEI™ v2.2 Immutable Hourly Time-Series Ledger Logger
 Fetches the live signed OCEI state from https://orbitcompute.ai/v1/index/ocei,
-optionally captures live terrestrial EU wholesale spot electricity (EPEX DE-LU),
+captures live European wholesale spot electricity (EPEX DE-LU),
 and appends a SHA-256 hash-chained record into ledger/YYYY-MM.jsonl and ledger/latest.json.
 """
 
@@ -13,7 +13,6 @@ import hashlib
 import json
 import pathlib
 import sys
-import urllib.error
 import urllib.request
 from typing import Any
 
@@ -23,23 +22,22 @@ EU_SPOT_URL = "https://api.energy-charts.info/price?bzn=DE-LU"
 LEDGER_DIR = pathlib.Path("ledger")
 LATEST_PATH = LEDGER_DIR / "latest.json"
 GENESIS_HASH = "GENESIS_OCEI_V2_2_DOI_10_5281_ZENODO_24181722"
+EUR_TO_USD_REF = 1.08
 
 
 def fetch_json(url: str, timeout: int = 20) -> dict[str, Any]:
     req = urllib.request.Request(
         url,
         headers={
-            "User-Agent": "OCEI-Ledger-Bot/1.0 (+https://github.com/Mr-Didi/mcp-ocei-oracle)",
+            "User-Agent": "OCEI-Ledger-Bot/1.1 (+https://github.com/Mr-Didi/mcp-ocei-oracle)",
             "Accept": "application/json",
         },
     )
     with urllib.request.urlopen(req, timeout=timeout) as resp:
-        raw = resp.read().decode("utf-8")
-        return json.loads(raw)
+        return json.loads(resp.read().decode("utf-8"))
 
 
 def canonical_json(obj: Any) -> str:
-    """Deterministic JSON serialization (RFC-8785 compatible for strings/ints/structs)."""
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
@@ -47,24 +45,7 @@ def sha256_hex(data: str) -> str:
     return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
 
-def extract_metric(payload: dict[str, Any], candidates: list[list[str]]) -> Any:
-    """Schema-resilient lookup across flat or nested OCEI JSON structures."""
-    for path in candidates:
-        cur: Any = payload
-        found = True
-        for key in path:
-            if isinstance(cur, dict) and key in cur:
-                cur = cur[key]
-            else:
-                found = False
-                break
-        if found and cur is not None:
-            return cur
-    return None
-
-
-def fetch_live_eu_spot_price() -> dict[str, Any] | None:
-    """Non-blocking fetch of current EPEX Spot DE-LU electricity price (EUR/MWh)."""
+def fetch_live_eu_spot_price(breakeven_usd_mwh: float | None) -> dict[str, Any] | None:
     try:
         data = fetch_json(EU_SPOT_URL, timeout=12)
         timestamps = data.get("unix_seconds") or []
@@ -72,7 +53,6 @@ def fetch_live_eu_spot_price() -> dict[str, Any] | None:
         if not timestamps or not prices:
             return None
         now_ts = int(dt.datetime.now(dt.timezone.utc).timestamp())
-        # Pick the latest slot <= now, or fallback to last non-null entry
         best_idx = None
         for idx, ts in enumerate(timestamps):
             if prices[idx] is not None and ts <= now_ts:
@@ -84,11 +64,16 @@ def fetch_live_eu_spot_price() -> dict[str, Any] | None:
                     break
         if best_idx is None:
             return None
+        eur_mwh = round(float(prices[best_idx]), 2)
+        usd_est = round(eur_mwh * EUR_TO_USD_REF, 2)
+        ratio = round(usd_est / breakeven_usd_mwh, 2) if breakeven_usd_mwh else None
         return {
             "market": "EPEX_SPOT_DE_LU",
             "source": "energy-charts.info",
             "slot_utc": dt.datetime.fromtimestamp(timestamps[best_idx], tz=dt.timezone.utc).isoformat(),
-            "price_eur_mwh": round(float(prices[best_idx]), 2),
+            "price_eur_mwh": eur_mwh,
+            "price_usd_mwh_est": usd_est,
+            "multiple_vs_orbital_breakeven": ratio,
         }
     except Exception as exc:
         return {"market": "EPEX_SPOT_DE_LU", "status": "unavailable", "error": str(exc)}
@@ -114,61 +99,65 @@ def main() -> int:
     month_file = LEDGER_DIR / f"{now.strftime('%Y-%m')}.jsonl"
 
     ocei_payload = fetch_json(OCEI_INDEX_URL)
-    jwks_kid = None
-    try:
-        jwks = fetch_json(OCEI_JWKS_URL, timeout=10)
-        keys = jwks.get("keys") or []
-        if keys and isinstance(keys[0], dict):
-            jwks_kid = keys[0].get("kid")
-    except Exception:
-        pass
+    std = ocei_payload.get("ocei_standard") or {}
+    multi = std.get("multi_regime_comparison") or {}
+    sw = ocei_payload.get("space_weather_and_young_daly_checkpointing") or {}
+    att = ocei_payload.get("attestation") or {}
 
-    eu_spot = fetch_live_eu_spot_price()
+    jwks_kid = att.get("key_id")
+    if not jwks_kid:
+        try:
+            jwks = fetch_json(OCEI_JWKS_URL, timeout=10)
+            keys = jwks.get("keys") or []
+            if keys and isinstance(keys[0], dict):
+                jwks_kid = keys[0].get("kid")
+        except Exception:
+            pass
+
+    ocei_spot = std.get("ocei_spot_realtime_score")
+    ocei_structural = std.get("ocei_structural_5yr_score")
+    ocei_twap = std.get("ocei_twap_60m_settlement_score")
+    vleo_score = (multi.get("vleo_320km_self_cleaning_edge") or {}).get("score")
+    spread_bps = std.get("net_orbital_spread_bps")
+    breakeven_usd_mwh = std.get("breakeven_grid_usd_mwh")
+    dispatch_signal = std.get("arbitrage_dispatch_signal")
+    dispatch_directive = std.get("dispatch_directive")
+
+    eu_spot = fetch_live_eu_spot_price(breakeven_usd_mwh)
     prev_hash, prev_seq, rolling_window = load_previous_head()
-
-    ocei_spot = extract_metric(
-        ocei_payload,
-        [
-            ["ocei_spot"],
-            ["index", "ocei_spot"],
-            ["scores", "spot"],
-            ["ocei", "spot"],
-            ["score"],
-        ],
-    )
-    ocei_structural = extract_metric(
-        ocei_payload,
-        [
-            ["ocei_structural"],
-            ["index", "ocei_structural"],
-            ["scores", "structural"],
-            ["ocei", "structural"],
-        ],
-    )
-    ocei_twap = extract_metric(
-        ocei_payload,
-        [
-            ["ocei_twap_60m"],
-            ["index", "ocei_twap_60m"],
-            ["scores", "twap_60m"],
-            ["twap_60m"],
-        ],
-    )
-    dispatch_signal = extract_metric(
-        ocei_payload,
-        [
-            ["dispatch_signal"],
-            ["signal"],
-            ["arbitrage", "dispatch_signal"],
-            ["routing", "dispatch_signal"],
-            ["decision"],
-        ],
-    )
 
     if isinstance(ocei_spot, (int, float)):
         rolling_window = (rolling_window + [round(float(ocei_spot), 4)])[-24:]
 
     raw_payload_sha256 = sha256_hex(canonical_json(ocei_payload))
+
+    summary = {
+        "ocei_spot": ocei_spot,
+        "ocei_structural": ocei_structural,
+        "ocei_twap_60m": ocei_twap,
+        "vleo_320km_score": vleo_score,
+        "terrestrial_tier4_score": std.get("terrestrial_tier4_grid_score"),
+        "net_orbital_spread_bps": spread_bps,
+        "breakeven_grid_usd_mwh": breakeven_usd_mwh,
+        "dispatch_signal": dispatch_signal,
+        "dispatch_directive": dispatch_directive,
+        "confidence_score": std.get("confidence_score"),
+        "rolling_24h_mean_spot": round(sum(rolling_window) / len(rolling_window), 4)
+        if rolling_window
+        else None,
+        "space_weather": {
+            "status": sw.get("telemetry_status"),
+            "observation_utc": sw.get("observation_utc"),
+            "l1_lead_min": sw.get("l1_shockwave_lead_time_min"),
+            "pre_emptive_trigger": sw.get("pre_emptive_checkpoint_trigger"),
+            "f10_7_sfu": sw.get("solar_flux_f10_7_sfu"),
+            "kp": sw.get("geomagnetic_kp_index"),
+            "goes_proton_pfu": sw.get("goes_proton_flux_ge10mev_pfu"),
+            "goes_xray_class": sw.get("goes_xray_flare_class"),
+            "net_availability_pct": sw.get("net_effective_compute_availability_pct"),
+        },
+        "live_terrestrial_spot": eu_spot,
+    }
 
     entry_body = {
         "schema": "ocei.ledger.v1",
@@ -176,18 +165,10 @@ def main() -> int:
         "recorded_utc": now.isoformat().replace("+00:00", "Z"),
         "source_endpoint": OCEI_INDEX_URL,
         "jwks_kid": jwks_kid,
+        "oracle_state_hash_sha256": att.get("state_hash_sha256"),
         "prev_ledger_hash": prev_hash,
         "raw_payload_sha256": raw_payload_sha256,
-        "summary": {
-            "ocei_spot": ocei_spot,
-            "ocei_structural": ocei_structural,
-            "ocei_twap_60m": ocei_twap,
-            "dispatch_signal": dispatch_signal,
-            "rolling_24h_mean_spot": round(sum(rolling_window) / len(rolling_window), 4)
-            if rolling_window
-            else None,
-            "live_terrestrial_spot": eu_spot,
-        },
+        "summary": summary,
         "signed_payload": ocei_payload,
     }
 
@@ -204,16 +185,18 @@ def main() -> int:
         "ledger_file": str(month_file).replace("\\", "/"),
         "prev_ledger_hash": prev_hash,
         "ledger_entry_hash": ledger_entry_hash,
+        "oracle_state_hash_sha256": att.get("state_hash_sha256"),
         "raw_payload_sha256": raw_payload_sha256,
         "jwks_kid": jwks_kid,
-        "summary": entry["summary"],
+        "summary": summary,
         "rolling_24h_spot_window": rolling_window,
     }
     LATEST_PATH.write_text(json.dumps(latest_head, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
     print(
         f"[OCEI LEDGER] seq={entry['sequence']} hash={ledger_entry_hash[:16]}... "
-        f"spot={ocei_spot} signal={dispatch_signal} eu_spot={eu_spot}"
+        f"spot={ocei_spot} twap={ocei_twap} signal={dispatch_signal} "
+        f"avail={sw.get('net_effective_compute_availability_pct')}% eu_spot={eu_spot}"
     )
     return 0
 
