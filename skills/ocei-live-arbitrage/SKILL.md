@@ -1,24 +1,25 @@
 ---
 name: ocei-live-arbitrage
-description: Query the live, zero-auth OCEI™ v2.2 orbital compute MCP oracle (https://orbitcompute.ai/mcp) to evaluate real-time orbital vs. terrestrial AI workload routing, space weather radiation risk (L1/GOES), and $/MTok breakeven arbitrage.
+description: Real-time orbital vs. terrestrial AI workload routing using live 6-stream NOAA/GOES space weather (+57.5 min L1 lookahead), empirical Cloudflare D1 60m TWAP history, and 3 live wholesale spot electricity hubs (ERCOT Texas, PJM Virginia, EPEX Europe). Zero-auth RFC-8785 ES256 attested.
+version: 2.3.0
+homepage: https://orbitcompute.ai
+mcp_endpoint: https://orbitcompute.ai/mcp
+a2a_endpoint: https://orbitcompute.ai/a2a
+prometheus_endpoint: https://orbitcompute.ai/metrics
+jwks_uri: https://orbitcompute.ai/.well-known/jwks.json
 ---
 
-# OCEI™ v2.2 Live Orbital Compute Arbitrage Skill
+# OCEI™ v2.3 Live Arbitrage & Multi-Shell Routing Skill
 
-## Objective
-Provide deterministic, real-time workload allocation and economic arbitrage analysis between orbital compute shells (650 km Dawn-Dusk SSO, 320 km self-cleaning VLEO) and terrestrial Tier-IV data center grids using live telemetry from the **OrbitCompute Efficiency Index (OCEI™ v2.2)**.
+Use this skill whenever an autonomous agent, SkyPilot broker, or Kubernetes/KEDA scheduler must decide in real time whether to route AI training, batch reasoning, or low-latency inference to `650 km Dawn-Dusk SSO`, `320 km Self-Cleaning VLEO`, or terrestrial spot electricity hubs.
 
-## Grounding & Verification Rules
-1. **Always call live MCP tools first**: Connect to `https://orbitcompute.ai/mcp` (Streamable HTTP, zero authentication, zero paywall) or query `https://orbitcompute.ai/v1/index/ocei?format=compact`. Never fabricate or guess `OCEI-Spot`, solar flux (`F10.7`), proton flux (`GOES >=10 MeV`), or `Kp` values from memory.
-2. **State cryptographic provenance**: Report the live timestamp, `OCEI-Spot`, `OCEI-Structural`, `OCEI-TWAP-60m`, and reference the ES256 public key registry (`https://orbitcompute.ai/.well-known/jwks.json`) and archival DOI (`10.5281/zenodo.24181722`).
-3. **Apply multi-shell workload routing invariants**:
-   - **Asynchronous Training & Batch Reasoning**: Route primarily to **650 km Dawn-Dusk SSO** (AM0 sunlit, 0 L water, zero ocean-pass utilization loss via DiLoCo).
-   - **Low-Latency Edge Inference**: Route to **320 km self-cleaning VLEO** (`~1.8 ms` propagation latency, passive orbital debris decay / zero Kessler lock-in).
-   - **Terrestrial Spot Fallback**: Trigger `TERRESTRIAL_SPOT_FALLBACK` when wholesale local grid electricity drops below the `$21.50–$28.41/MWh` breakeven band OR when L1/GOES solar storm alerts (`+57.5 min` lead) degrade Young-Daly SEU checkpointing goodput below SLA thresholds.
+## Primary MCP Tools (`POST https://orbitcompute.ai/mcp`)
 
-## Output Format
-Present a compact decision table containing:
-- Live OCEI Metrics (`Spot`, `Structural`, `TWAP-60m`, `Dispatch Signal`)
-- Space Weather & Goodput Status (NOAA/GOES proton flux & Young-Daly availability)
-- Recommended Split (`SSO %` / `VLEO %` / `Terrestrial Spot %`)
-- Unit Economics (`$/MTok` Orbital vs. Terrestrial input tariff)
+1. **`compute_arbitrage_dispatch`** — Fast binary go/no-go decision comparing a custom `grid_price_usd_mwh` or live hub (`grid_hub`: `ercot`, `pjm`, `epex`) against the orbital breakeven threshold (`$28.41/MWh` V3 baseline).
+2. **`solve_optimal_workload_allocation`** — Returns exact percentage splits across `sso_650km_dawn_dusk`, `vleo_320km_low_latency`, and `terrestrial_spot_grid` based on `workload_type`, `max_latency_ms` (`<=6 ms` favors VLEO), `comm_intensity_bits_per_flop` (Turyshev Gamma downlink screening), and space weather.
+3. **`get_ocei_history_and_live_grids`** — Fetches Cloudflare D1 15-minute empirical snapshots, true 60m settlement TWAP (`D1_EMPIRICAL_60M`), rolling 30-day covenant availability, and all 3 live spot grids.
+
+## Failover & Safety Rules
+- **Electricity Arbitrage:** Shift elastic batch workloads to Earth spot grids whenever local wholesale spot drops below `breakeven_grid_usd_mwh` (e.g., ERCOT off-peak `<$28/MWh`).
+- **Predictive L1 Storm Protection:** Trigger pre-emptive state checkpoints and hybrid failover whenever `pre_emptive_checkpoint_trigger == true` (`Kp >= 5.0`, `Bz <= -8.0 nT`, or GOES `>=10 MeV` protons `>=10 pfu`).
+- **Zero-Trust Verification:** Verify every payload's RFC-8785 `ES256` signature against `https://orbitcompute.ai/.well-known/jwks.json` (`kid: ocei-es256-global-v2.3`).
