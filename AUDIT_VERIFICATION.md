@@ -31,3 +31,34 @@ async function auditLiveOracle() {
   console.log({ valid, key_id: att.key_id, state_hash_sha256: att.state_hash_sha256 });
 }
 auditLiveOracle();
+```
+
+## 2. Verify Immutable GitHub Ledger Hash Chain (`ledger/2026-11.jsonl`)
+
+Run locally with Python 3 (zero external packages):
+
+```bash
+python3 -c '
+import glob, hashlib, json
+prev = "GENESIS_OCEI_V2_2_DOI_10_5281_ZENODO_24181722"
+count = 0
+for path in sorted(glob.glob("ledger/20*.jsonl")):
+    with open(path, encoding="utf-8") as f:
+        for line in f:
+            entry = json.loads(line)
+            assert entry["prev_ledger_hash"] == prev, f"Chain break at seq {entry[\"sequence\"]}"
+            core = {k: v for k, v in entry.items() if k != "ledger_entry_hash"}
+            calc = hashlib.sha256(json.dumps(core, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+            assert calc == entry["ledger_entry_hash"], f"Hash mismatch at seq {entry[\"sequence\"]}"
+            prev = entry["ledger_entry_hash"]
+            count += 1
+print(f"VERIFIED {count} IMMUTABLE LEDGER BLOCKS. HEAD={prev[:16]}...")
+'
+```
+
+## 3. Key Rotation Registry (`/.well-known/jwks.json`)
+
+| Key ID (`kid`) | Status | Algorithm | Scope |
+| :--- | :--- | :--- | :--- |
+| `ocei-es256-global-v2.3` | **ACTIVE** | ECDSA P-256 (`ES256`) | Production secret key for all `v2.3.0+` payloads |
+| `ocei-es256-global-v2.2` | **RETIRED (Retained)** | ECDSA P-256 (`ES256`) | Historical verification of `v2.2` ledger entries (`seq 1–6`) |
