@@ -1,43 +1,84 @@
 {
   "schema": "ocei.ledger.head.v1",
-  "sequence": 6,
-  "recorded_utc": "2026-11-21T13:02:28.145456Z",
+  "sequence": 7,
+  "recorded_utc": "2026-11-21T14:19:01.697227Z",
   "ledger_file": "ledger/2026-11.jsonl",
-  "prev_ledger_hash": "c66d1905be7aed168dcbc3b31c0b505e5f682b25d1389035def749dafff5f3d1",
-  "ledger_entry_hash": "1c782992a914acd4b82373f573dd786d9c0ee817ad6f1d371ece5314e454f20b",
-  "oracle_state_hash_sha256": "e2f460bf57e9b5c59792fe198bb38708b5d2a627202c0f13421ccd001cabdecd",
-  "raw_payload_sha256": "e1ee7931e865bb2de18fa50f5c263bc1b6c8eebf6d1780ce5c6cddd86a6ee4ee",
+  "prev_ledger_hash": "1c782992a914acd4b82373f573dd786d9c0ee817ad6f1d371ece5314e454f20b",
+  "ledger_entry_hash": "004a3df86ff07be12b832807bcada5437c2a0de7f51cfb36130db3914ec55592",
+  "oracle_state_hash_sha256": "7b5bc30c47c2ab025bf9c1e84dd73aa9210121ede73a222d50201c274c3d5360",
+  "raw_payload_sha256": "62af0ae5c4c4304c8a3b1993447239527cff05364a60d0b93d60bbf50f560ac0",
   "jwks_kid": "ocei-es256-global-v2.3",
   "summary": {
-    "ocei_spot": 963,
+    "schema_version": "2.3.0",
+    "ocei_spot": 963.0,
     "ocei_structural": 975.3,
-    "ocei_twap_60m": 963.8,
+    "ocei_twap_60m": 962.4,
+    "twap_60m_source": "D1_EMPIRICAL_60M",
     "vleo_320km_score": 944.6,
     "terrestrial_tier4_score": 530,
     "net_orbital_spread_bps": 433,
     "breakeven_grid_usd_mwh": 28.41,
     "dispatch_signal": "ORBIT_PRIMARY",
     "dispatch_directive": "ROUTE_TO_ORBIT_DAWN_DUSK_SSO",
-    "confidence_score": 0.954,
-    "rolling_24h_mean_spot": 963.8167,
+    "confidence_score": 0.95,
+    "rolling_24h_mean_spot": 963.7,
     "space_weather": {
       "status": "NOMINAL_LIVE_NOAA_SWPC",
-      "observation_utc": "2026-11-21T12:57:00Z",
+      "observation_utc": "2026-11-21T14:13:00Z",
       "l1_lead_min": 57.5,
       "pre_emptive_trigger": false,
       "f10_7_sfu": 158,
       "kp": 1.4,
-      "goes_proton_pfu": 0.2,
-      "goes_xray_class": "B3.3",
-      "net_availability_pct": 97.55
+      "goes_proton_pfu": 0.29,
+      "goes_xray_class": "B3.1",
+      "net_availability_pct": 97.54
+    },
+    "live_terrestrial_spot_grids": {
+      "ercot_texas": {
+        "market": "ERCOT Texas (HB_HUBAVG)",
+        "source": "gridstatus.io",
+        "slot_utc": "2026-11-21T13:45:00Z",
+        "price_usd_mwh": 16.6,
+        "price_native": 16.6,
+        "currency": "USD",
+        "multiple_vs_orbital_breakeven": 0.58,
+        "live_dispatch_signal": "TERRESTRIAL_SPOT_ARBITRAGE"
+      },
+      "pjm_virginia": {
+        "market": "PJM Northern Virginia (WESTERN HUB)",
+        "source": "gridstatus.io",
+        "slot_utc": "2026-11-21T11:55:00Z",
+        "price_usd_mwh": 129.76,
+        "price_native": 129.76,
+        "currency": "USD",
+        "multiple_vs_orbital_breakeven": 4.57,
+        "live_dispatch_signal": "ORBIT_PRIMARY"
+      },
+      "epex_europe": {
+        "market": "EPEX Spot Europe (DE-LU)",
+        "source": "awattar.de/epex",
+        "slot_utc": "2026-11-21T14:00:00Z",
+        "price_usd_mwh": 211.08,
+        "price_native": 195.44,
+        "currency": "EUR",
+        "multiple_vs_orbital_breakeven": 7.43,
+        "live_dispatch_signal": "ORBIT_PRIMARY"
+      }
     },
     "live_terrestrial_spot": {
-      "market": "EPEX_SPOT_DE_LU",
-      "source": "energy-charts.info",
-      "slot_utc": "2026-11-21T13:00:00+00:00",
-      "price_eur_mwh": 161.34,
-      "price_usd_mwh_est": 174.25,
-      "multiple_vs_orbital_breakeven": 6.13
+      "market": "EPEX Spot Europe (DE-LU)",
+      "source": "awattar.de/epex",
+      "slot_utc": "2026-11-21T14:00:00Z",
+      "price_eur_mwh": 195.44,
+      "price_usd_mwh_est": 211.08,
+      "multiple_vs_orbital_breakeven": 7.43
+    },
+    "covenant_triggers": {
+      "storm_interruption_flag": false,
+      "rolling_30d_availability_pct": 97.58,
+      "cash_trap_threshold_pct": 90,
+      "cash_trap_breached": false,
+      "d1_samples_30d": 57
     }
   },
   "rolling_24h_spot_window": [
@@ -46,6 +87,7 @@
     962.4,
     964.5,
     965.9,
+    963.0,
     963.0
   ]
 }
