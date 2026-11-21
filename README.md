@@ -1,58 +1,21 @@
-# OCEI™ v2.2 — Orbital Compute Efficiency Index & Arbitrage Oracle (MCP Server, Ledger & SDK)
+# OCEI™ v2.3 — Orbital Compute Efficiency Index & Live Arbitrage Oracle (MCP / A2A / Prometheus)
 
-[![OCEI v2.2 Live Benchmark](https://orbitcompute.ai/v1/index/ocei/badge.svg)](https://orbitcompute.ai/ocei)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24181722.svg)](https://doi.org/10.5281/zenodo.24181722)
-[![Protocol](https://img.shields.io/badge/MCP-JSON--RPC%202.0%20%7C%20Zero--Auth-brightgreen)](https://orbitcompute.ai/mcp)
-[![Attestation](https://img.shields.io/badge/Crypto-RFC--8785%20%2B%20ES256-orange)](https://orbitcompute.ai/.well-known/jwks.json)
+[![OCEI v2.3 Live Oracle](https://orbitcompute.ai/v1/index/ocei/badge.svg)](https://orbitcompute.ai/ocei)
+[![DOI](https://img.shields.io/badge/Zenodo%20DOI-10.5281%2Fzenodo.24181722-38bdf8.svg)](https://doi.org/10.5281/zenodo.24181722)
+[![Protocol](https://img.shields.io/badge/MCP%20%7C%20A2A%20%7C%20Prometheus-Zero--Auth-10b981.svg)](https://orbitcompute.ai/v1/openapi.json)
 
-Official **Model Context Protocol (MCP)** server, immutable hourly cryptographic ledger, native agent skills, and multi-stack SkyPilot/Python reference client for **[OrbitCompute.ai](https://orbitcompute.ai)**, publisher of the **OCEI™ v2.2 (Orbital Compute Efficiency Index)**.
+Official reference repository, cryptographic audit ledger, Kubernetes/KEDA manifests, and zero-dependency Python SDK for **[OrbitCompute.ai](https://orbitcompute.ai)** — the vendor-neutral, cryptographically attested (**RFC 8785 + ECDSA P-256**) control plane comparing orbital AI compute shells (`650 km Dawn-Dusk SSO`, `320 km Self-Cleaning VLEO`, `550 km LEO`, `1,500 km MEO`) against terrestrial utility grids.
 
-- **Published Reference Specification (CERN / Zenodo DOI):** https://doi.org/10.5281/zenodo.24181722
-- **Official MCP Registry ID:** `io.github.Mr-Didi/mcp-ocei-oracle`
-- **Access Model:** Zero OAuth · Zero Paywall · Machine-to-Machine Native (`<160 Tokens` compact feed)
+## What Is New in `v2.3.0`
+- **Cloudflare D1 Empirical Persistence (`15m` Cron):** True empirical 60-minute settlement TWAP (`D1_EMPIRICAL_60M`) and rolling 30-day covenant availability at `GET /v1/telemetry/history`.
+- **3 Live Wholesale Spot Electricity Hubs:** Real-time arbitrage across **ERCOT Texas** (`HB_HUBAVG`), **PJM Northern Virginia** (`WESTERN HUB`), and **EPEX Spot Europe** (`DE-LU`) at `GET /v1/telemetry/live-grids`.
+- **Production Hardware-Isolated ES256 Key (`ocei-es256-global-v2.3`):** Multi-year public key retention (including retired `v2.2` key) at `/.well-known/jwks.json`.
+- **4-Tool MCP Server + A2A v1.0 + Prometheus `/metrics`:** Strictly separated tool schemas, native A2A `message/send` (`/a2a`), `/.well-known/agents.json`, and KEDA/Kubernetes autoscaling manifests (`k8s/keda-orbital-scaler.yaml`).
+- **Expanded Physics & Credit Underwriting Kernel:** Adds `terafab_370k` high-Tj silicon, `starship_v4` / `new_glenn_9x4` launch elasticity, Turyshev communication-intensity Gamma (`bit/J`) and `deployed_mass_kg_per_it_kw` (`m_kW`), hardware attrition stress (`3.5%` / `9.0%`), `$/W` payback, and binary parametric covenant triggers.
 
-Provides cryptographically attested (**RFC 8785 JSON Canonicalization + ECDSA P-256 `ES256`**) real-time evaluations comparing orbital AI compute shells (**650 km Dawn-Dusk SSO**, **320 km VLEO Edge**, **550 km LEO**, **1,500 km MEO**) across vendor-neutral hardware stacks (**SpaceX StarMind / Vera Rubin**, **Blue Origin & Google Suncatcher / Trillium TPU**, **Blackwell GB200**) against **Terrestrial Tier-IV Utility Grids** using 6 live **NOAA SWPC & GOES satellite telemetry streams**.
+## Executable MCP Server (Zero-Auth, Streamable HTTP)
 
----
-
-## Live Specification & Endpoints
-
-- **Interactive Control Room & Multi-Physics Simulator:** https://orbitcompute.ai
-- **Institutional TCO & Capital Allocation Dossier:** https://orbitcompute.ai/dossier
-- **Formal Mathematical Specification & CODATA Registry:** https://orbitcompute.ai/ocei
-- **CERN / Zenodo Archival PDF (DOI: 10.5281/zenodo.24181722):** https://doi.org/10.5281/zenodo.24181722
-- **Token-Optimized Markdown Spec (for LLMs):** https://orbitcompute.ai/ocei.md
-- **Live Attested JSON Feed:** https://orbitcompute.ai/v1/index/ocei
-- **Ultra-Compact M2M Feed (<160 Tokens):** https://orbitcompute.ai/v1/index/ocei?format=compact
-- **Deterministic Workload Constraint Solver:** https://orbitcompute.ai/v1/solve/workload-allocation
-- **Global Verification Public Key (JWKS):** https://orbitcompute.ai/.well-known/jwks.json
-- **OpenAPI 3.1.0 Specification:** https://orbitcompute.ai/v1/openapi.json
-
----
-
-## Exposed MCP Tools
-
-1. **`evaluate_orbital_compute_regime`**: Computes live `OCEI-Spot`, `OCEI-Structural`, and `60m-TWAP` scores, L1 solar-wind shockwave lead time (`+25` to `+62 min`), solar beta-angle ($\beta$) eclipse battery mass, 2-sided Stefan-Boltzmann radiator area with Earth IR/albedo view-factor absorption, Silicon $T_j$ thermal throttling, 25-MW fault-domain Young-Daly SEU checkpoint intervals, and WACC-adjusted `$/1M Token` unit economics.
-2. **`compute_arbitrage_dispatch`**: Evaluates real-time terrestrial electricity spot prices (`$/MWh`) against the orbital breakeven threshold to output an attested workload routing signal (`ORBIT_PRIMARY`, `HYBRID_SPLIT`, or `TERRESTRIAL_PRIMARY`).
-3. **`solve_optimal_workload_allocation`**: Deterministic constraint solver returning the optimal percentage split across `SSO-650`, `VLEO-320`, and `Terrestrial-Spot` based on workload class and latency tolerance.
-
----
-
-## Quickstart: Connect Any AI Agent in 10 Seconds
-
-### Option A: One-Line CLI Installers (Zero Login, Zero API Key)
-
-**Claude Code**
-```bash
-claude mcp add --transport http --scope user ocei-oracle [https://orbitcompute.ai/mcp](https://orbitcompute.ai/mcp)
-```
-
-**OpenAI Codex CLI**
-```bash
-codex mcp add ocei-oracle --url [https://orbitcompute.ai/mcp](https://orbitcompute.ai/mcp)
-```
-
-### Option B: Direct Streamable HTTP / Remote MCP (Claude Desktop / Cursor / Windsurf)
+Connect any MCP client (Claude, Cursor, Windsurf, custom agents) directly to:
 
 ```json
 {
@@ -64,70 +27,45 @@ codex mcp add ocei-oracle --url [https://orbitcompute.ai/mcp](https://orbitcompu
 }
 ```
 
-### Option C: Local Docker / Node.js Bridge
+| MCP Tool | Purpose |
+| :--- | :--- |
+| `evaluate_orbital_compute_regime` | Full 4-pillar physics, 5-yr TCO, `$/W` payback, Turyshev Gamma, attrition stress & credit underwriting audit |
+| `compute_arbitrage_dispatch` | Fast binary go/no-go grid-vs.-orbit dispatch against custom `$/MWh` or live `ercot` / `pjm` / `epex` hubs |
+| `solve_optimal_workload_allocation` | Multi-shell percentage solver (`SSO 650 km` / `VLEO 320 km` / `Earth Spot`) with latency & downlink constraints |
+| `get_ocei_history_and_live_grids` | Cloudflare D1 empirical 15-min history, true 60m TWAP, 30d covenant availability & 3 live wholesale grids |
 
-```bash
-git clone [https://github.com/Mr-Didi/mcp-ocei-oracle.git](https://github.com/Mr-Didi/mcp-ocei-oracle.git)
-node mcp-ocei-oracle/index.mjs
+## Core Protocol Endpoints
+- **Control Room & Simulator:** `https://orbitcompute.ai/`
+- **Formal Mathematical Specification:** `https://orbitcompute.ai/ocei` (`https://orbitcompute.ai/ocei.md`)
+- **Institutional Reference Dossier:** `https://orbitcompute.ai/dossier`
+- **IOSCO Governance Charter:** `https://orbitcompute.ai/governance` ([GOVERNANCE.md](./GOVERNANCE.md))
+- **Live Attested Index & Compact M2M:** `GET /v1/index/ocei` | `GET /v1/index/ocei?format=compact`
+- **D1 Time-Series & Live Grids:** `GET /v1/telemetry/history` | `GET /v1/telemetry/live-grids`
+- **A2A v1.0 & Discovery:** `POST /a2a` | `/.well-known/agent-card.json` | `/.well-known/agents.json` | `/v1/openapi.json`
+- **Prometheus / KEDA Metrics:** `GET /metrics` (see [`k8s/keda-orbital-scaler.yaml`](./k8s/keda-orbital-scaler.yaml))
+
+## Quickstart: Python SDK & Cryptographic Verification
+
+```python
+from sdk.ocei_router import OceiOracleClient, verify_state_hash
+
+client = OceiOracleClient()
+grids = client.get_live_grids()
+assert verify_state_hash(grids)["sha256_match"] is True
+print(grids["live_terrestrial_spot_grids"]["ercot_texas"])
 ```
 
-### Install Native Agent Skills (`~/.claude/skills/` or `~/.agents/skills/`)
+Full cryptographic and hash-chain verification instructions: [`AUDIT_VERIFICATION.md`](./AUDIT_VERIFICATION.md).
 
-```bash
-git clone [https://github.com/Mr-Didi/mcp-ocei-oracle.git](https://github.com/Mr-Didi/mcp-ocei-oracle.git)
-cp -r mcp-ocei-oracle/skills/* ~/.claude/skills/
-```
-
-Included zero-auth skills:
-- **`ocei-live-arbitrage`**: Real-time SSO / VLEO / Terrestrial dispatch routing grounded in live NOAA/GOES space weather telemetry (`+57.5 min` L1 lead) and ES256 provenance.
-- **`ocei-multi-stack-diligence`**: Vendor-neutral `$/W` and `$/MTok` institutional underwriting across **SpaceX StarMind (Vera Rubin NVL72)**, **Blue Origin/Google Project Suncatcher (Trillium TPU)**, and **Terrestrial Tier-IV grids**.
-
----
-
-## Multi-Stack Python & SkyPilot Arbitrage SDK (`sdk/ocei_router.py`)
-
-Zero-dependency Python client that queries the live OCEI™ v2.2 oracle, evaluates hardware stack profiles (`rubin`, `trillium`, `blackwell`, `terafab_370k`) against static or live wholesale spot electricity (EPEX DE-LU), and emits ready-to-run SkyPilot YAML dispatch manifests:
-
-```bash
-# 100 MW Vera Rubin training cluster vs. $115/MWh US Tier-IV baseline -> SkyPilot YAML
-python3 sdk/ocei_router.py --workload training --power-mw 100 --stack rubin --emit-skypilot
-
-# 10 MW Google Trillium TPU inference cluster vs. live EU EPEX Spot (DE-LU) electricity
-python3 sdk/ocei_router.py --workload inference --power-mw 10 --stack trillium --live-eu-grid
-```
-
-Optional local ECDSA P-256 (`ES256`) cryptographic signature verification against `/.well-known/jwks.json`:
-```bash
-pip install cryptography
-```
-
----
-
-## Immutable Hourly Cryptographic Ledger (`ledger/`)
-
-Every hour at `:05 UTC`, GitHub Actions executes `scripts/append_ledger.py` to build a publicly auditable, append-only time-series archive:
-1. Fetches the live signed state from `https://orbitcompute.ai/v1/index/ocei` alongside live European wholesale spot electricity (`EPEX DE-LU`).
-2. Chains each record via SHA-256 (`prev_ledger_hash` → `ledger_entry_hash`).
-3. Commits immutable logs to `ledger/YYYY-MM.jsonl` and updates the rolling 24h pointer at `ledger/latest.json`.
-
----
-
-## Academic & Industry Citation (DOI: 10.5281/zenodo.24181722)
-
-> Spatial Compute Holdings, "OCEI v2.2: Orbital Compute Efficiency Index — Deterministic Thermodynamic, Radiative, Optical, and Token-Economic Reference Model," Zenodo, 2026. doi: 10.5281/zenodo.24181722. Available: https://doi.org/10.5281/zenodo.24181722
+## Citation
 
 ```bibtex
-@techreport{ocei_v2_2_2026,
+@techreport{spatialcomputeholdings2026ocei,
   author      = {{Spatial Compute Holdings // OrbitCompute Data Consortium}},
-  title       = {{OCEI v2.2: Orbital Compute Efficiency Index — Deterministic Thermodynamic, Radiative, Optical, and Token-Economic Reference Model}},
+  title       = {{OCEI v2.3: Orbital Compute Efficiency Index — Deterministic Thermodynamic, Radiative, Optical, Credit-Underwriting, and Token-Economic Reference Model}},
   institution = {OrbitCompute.ai},
   year        = {2026},
   doi         = {10.5281/zenodo.24181722},
-  url         = {[https://doi.org/10.5281/zenodo.24181722](https://doi.org/10.5281/zenodo.24181722)}
+  url         = {[https://orbitcompute.ai/ocei](https://orbitcompute.ai/ocei)}
 }
 ```
-
-## License & Intellectual Property
-
-- **Client SDK, Ledger Scripts & Agent Skills (`sdk/`, `scripts/`, `skills/`, `index.mjs`):** Released under the **MIT License** to maximize adoption across autonomous schedulers, SkyPilot, Kubernetes, and AI agent frameworks.
-- **OCEI™ Trademark & Canonical Oracle Specification:** © 2026 Spatial Compute Holdings // OrbitCompute Data Consortium. All rights reserved.
