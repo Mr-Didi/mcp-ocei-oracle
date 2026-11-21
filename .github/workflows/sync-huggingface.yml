@@ -24,14 +24,15 @@ jobs:
           HF_DATASET_REPO: ${{ secrets.HF_DATASET_REPO }}
         run: |
           python3 - <<'PY'
-          import os
+          import os, textwrap
           from huggingface_hub import HfApi
 
           repo_id = os.environ["HF_DATASET_REPO"].strip()
           token = os.environ["HF_TOKEN"].strip()
           api = HfApi(token=token)
 
-          hf_frontmatter = """---
+          hf_frontmatter = textwrap.dedent("""\
+          ---
           license: cc-by-4.0
           pretty_name: OCEI v2.3 Orbital Compute & Live Grid Arbitrage Cryptographic Ledger
           task_categories:
@@ -48,10 +49,12 @@ jobs:
             - infrastructure-finance
           configs:
             - config_name: default
-              data_files: "ledger/20*.jsonl"
+              data_files:
+                - split: train
+                  path: "ledger/20*.jsonl"
           ---
 
-          """.replace("\n          ", "\n").lstrip()
+          """)
 
           with open("README.md", "r", encoding="utf-8") as f:
               readme_body = f.read()
@@ -70,7 +73,7 @@ jobs:
               path_in_repo="README.md",
               repo_id=repo_id,
               repo_type="dataset",
-              commit_message="sync(ocei): update Dataset Card with HF YAML metadata",
+              commit_message="sync(ocei): update Dataset Card with explicit train split YAML",
           )
           for doc in ("GOVERNANCE.md", "AUDIT_VERIFICATION.md"):
               if os.path.exists(doc):
