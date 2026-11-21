@@ -14,9 +14,9 @@ function canonicalizeRFC8785(obj) {
 
 async function auditLiveOracle() {
   const [payload, jwks] = await Promise.all([
-    fetch("[https://orbitcompute.ai/v1/index/ocei?format=compact](https://orbitcompute.ai/v1/index/ocei?format=compact)").then((r) => r.json()),
-    fetch("[https://orbitcompute.ai/.well-known/jwks.json](https://orbitcompute.ai/.well-known/jwks.json)").then((r) => r.json()),
-  ]);
+    fetch("(https://orbitcompute.ai/v1/index/ocei?format=compact)(https://orbitcompute.ai/v1/index/ocei?format=compact)").then((r) => r.json()),
+    fetch("(https://orbitcompute.ai/.well-known/jwks.json)(https://orbitcompute.ai/.well-known/jwks.json)").then((r) => r.json()),
+  ));
   const att = payload.attestation;
   const unsigned = { ...payload };
   delete unsigned.attestation;
@@ -61,4 +61,4 @@ print(f"VERIFIED {count} IMMUTABLE LEDGER BLOCKS. HEAD={prev[:16]}...")
 | Key ID (`kid`) | Status | Algorithm | Scope |
 | :--- | :--- | :--- | :--- |
 | `ocei-es256-global-v2.3` | **ACTIVE** | ECDSA P-256 (`ES256`) | Production secret key for all `v2.3.0+` payloads |
-| `ocei-es256-global-v2.2` | **RETIRED (Retained)** | ECDSA P-256 (`ES256`) | Historical verification of `v2.2` ledger entries (`seq 1–6`) |
+| `ocei-es256-global-v2.2` | **RETIRED (Retained)** | ECDSA P-256 (`ES256`) | Historical verification of `v2.2` ledger entries (`seq 1–4`) |
