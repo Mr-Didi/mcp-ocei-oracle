@@ -14,9 +14,8 @@ function canonicalizeRFC8785(obj) {
 
 async function auditLiveOracle() {
   const [payload, jwks] = await Promise.all([
-    fetch("(https://orbitcompute.ai/v1/index/ocei?format=compact)(https://orbitcompute.ai/v1/index/ocei?format=compact)").then((r) => r.json()),
-    fetch("(https://orbitcompute.ai/.well-known/jwks.json)(https://orbitcompute.ai/.well-known/jwks.json)").then((r) => r.json()),
-  ));
+  fetch("https://orbitcompute.ai/v1/index/ocei?format=compact").then((r) => r.json()),
+    fetch("https://orbitcompute.ai/.well-known/jwks.json").then((r) => r.json()),
   const att = payload.attestation;
   const unsigned = { ...payload };
   delete unsigned.attestation;
