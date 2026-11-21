@@ -35,7 +35,7 @@ spec:
       metadata:
         serverAddress: http://prometheus-operated.monitoring.svc:9090
         metricName: ocei_ercot_arbitrage_margin
-        query: clamp_min(ocei_breakeven_grid_usd_mwh - ocei_live_grid_usd_mwh{hub="ercot"}, 0)
+        query: clamp_min(scalar(ocei_breakeven_grid_usd_mwh) - ocei_live_grid_usd_mwh{hub="ercot"}, 0)
         threshold: "1.5"
     # Pre-emptive failover to Earth on DSCOVR L1 / GOES storm trigger (+57m lead window)
     - type: prometheus
