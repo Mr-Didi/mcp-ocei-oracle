@@ -2,12 +2,12 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.Mr-Didi/mcp-ocei-oracle",
   "title": "OCEI v2.3 Orbital Compute & Arbitrage Oracle",
-  "description": "Attested orbital AI compute physics, NOAA space-weather & $/MTok arbitrage oracle (OCEI v2.2).",
+  "description": "Attested orbital AI compute physics, NOAA/GOES space-weather, D1 TWAP & live 3-hub electricity arbitrage oracle (OCEI v2.3).",
   "repository": {
     "url": "https://github.com/Mr-Didi/mcp-ocei-oracle",
     "source": "github"
   },
-  "version": "2.2.0",
+  "version": "2.3.0",
   "remotes": [
     {
       "type": "streamable-http",
