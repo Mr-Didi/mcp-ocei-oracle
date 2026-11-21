@@ -42,7 +42,7 @@ Connect any MCP client (Claude, Cursor, Windsurf, custom agents) directly to:
 - **Live Attested Index & Compact M2M:** `GET /v1/index/ocei` | `GET /v1/index/ocei?format=compact`
 - **D1 Time-Series & Live Grids:** `GET /v1/telemetry/history` | `GET /v1/telemetry/live-grids`
 - **A2A v1.0 & Discovery:** `POST /a2a` | `/.well-known/agent-card.json` | `/.well-known/agents.json` | `/v1/openapi.json`
-- **Prometheus / KEDA Metrics:** `GET /metrics` (see ([k8s/keda-orbital-scaler.yaml](https://github.com/Mr-Didi/mcp-ocei-oracle/blob/main/k8s/keda-orbital-scaler.yaml))
+- **Prometheus / KEDA Metrics:** `GET /metrics` (see [k8s/keda-orbital-scaler.yaml](https://github.com/Mr-Didi/mcp-ocei-oracle/blob/main/k8s/keda-orbital-scaler.yaml))
 
 ## Quickstart: Python SDK & Cryptographic Verification
 
