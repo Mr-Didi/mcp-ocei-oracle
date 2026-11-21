@@ -1,0 +1,46 @@
+# OCEI v2.3 — Kubernetes / KEDA / Prometheus ExternalMetrics Integration
+# Scrapes https://orbitcompute.ai/metrics directly (zero-auth, <5 ms edge).
+# Routes terrestrial batch pods up when ERCOT falls below orbital breakeven OR on L1 storm trigger.
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ocei-prometheus-scrape
+  namespace: monitoring
+data:
+  ocei-scrape.yaml: |
+    scrape_configs:
+      - job_name: 'ocei-v2-3-oracle'
+        scrape_interval: 60s
+        scheme: https
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['orbitcompute.ai']
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: terrestrial-spot-arbitrage-worker
+  namespace: ai-workloads
+spec:
+  scaleTargetRef:
+    name: batch-reasoning-earth-spot
+  minReplicaCount: 0
+  maxReplicaCount: 64
+  pollingInterval: 60
+  cooldownPeriod: 300
+  triggers:
+    # Scale UP terrestrial Texas spot cluster when ERCOT < Orbital Breakeven ($28.41/MWh)
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus-operated.monitoring.svc:9090
+        metricName: ocei_ercot_arbitrage_margin
+        query: clamp_min(ocei_breakeven_grid_usd_mwh - ocei_live_grid_usd_mwh{hub="ercot"}, 0)
+        threshold: "1.5"
+    # Pre-emptive failover to Earth on DSCOVR L1 / GOES storm trigger (+57m lead window)
+    - type: prometheus
+      metadata:
+        serverAddress: http://prometheus-operated.monitoring.svc:9090
+        metricName: ocei_storm_failover
+        query: ocei_storm_preemptive_trigger
+        threshold: "1"
