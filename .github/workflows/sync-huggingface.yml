@@ -18,7 +18,7 @@ jobs:
       - name: Install huggingface_hub
         run: pip install --quiet huggingface_hub
 
-      - name: Upload ledger and metadata to Hugging Face Dataset
+      - name: Upload ledger and YAML-tagged Dataset Card to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
           HF_DATASET_REPO: ${{ secrets.HF_DATASET_REPO }}
@@ -31,6 +31,33 @@ jobs:
           token = os.environ["HF_TOKEN"].strip()
           api = HfApi(token=token)
 
+          hf_frontmatter = """---
+          license: cc-by-4.0
+          pretty_name: OCEI v2.3 Orbital Compute & Live Grid Arbitrage Cryptographic Ledger
+          task_categories:
+            - time-series-forecasting
+            - tabular-regression
+          tags:
+            - orbital-compute
+            - space-weather
+            - electricity-arbitrage
+            - mcp
+            - a2a
+            - prometheus
+            - ocei
+            - infrastructure-finance
+          configs:
+            - config_name: default
+              data_files: "ledger/20*.jsonl"
+          ---
+
+          """.replace("\n          ", "\n").lstrip()
+
+          with open("README.md", "r", encoding="utf-8") as f:
+              readme_body = f.read()
+          with open("/tmp/HF_README.md", "w", encoding="utf-8") as f:
+              f.write(hf_frontmatter + readme_body)
+
           api.upload_folder(
               folder_path="ledger",
               path_in_repo="ledger",
@@ -38,7 +65,14 @@ jobs:
               repo_type="dataset",
               commit_message="sync(ocei): daily cryptographic ledger snapshot from orbitcompute.ai",
           )
-          for doc in ("README.md", "GOVERNANCE.md", "AUDIT_VERIFICATION.md"):
+          api.upload_file(
+              path_or_fileobj="/tmp/HF_README.md",
+              path_in_repo="README.md",
+              repo_id=repo_id,
+              repo_type="dataset",
+              commit_message="sync(ocei): update Dataset Card with HF YAML metadata",
+          )
+          for doc in ("GOVERNANCE.md", "AUDIT_VERIFICATION.md"):
               if os.path.exists(doc):
                   api.upload_file(
                       path_or_fileobj=doc,
@@ -47,5 +81,5 @@ jobs:
                       repo_type="dataset",
                       commit_message=f"sync(ocei): update {doc}",
                   )
-          print(f"Synced OCEI v2.3 ledger to https://huggingface.co/datasets/{repo_id}")
+          print(f"Synced OCEI v2.3 ledger + YAML card to https://huggingface.co/datasets/{repo_id}")
           PY
