@@ -1,0 +1,51 @@
+name: Mirror OCEI Cryptographic Ledger to Hugging Face
+
+on:
+  schedule:
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync-to-hf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install huggingface_hub
+        run: pip install --quiet huggingface_hub
+
+      - name: Upload ledger and metadata to Hugging Face Dataset
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_DATASET_REPO: ${{ secrets.HF_DATASET_REPO }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+
+          repo_id = os.environ["HF_DATASET_REPO"].strip()
+          token = os.environ["HF_TOKEN"].strip()
+          api = HfApi(token=token)
+
+          api.upload_folder(
+              folder_path="ledger",
+              path_in_repo="ledger",
+              repo_id=repo_id,
+              repo_type="dataset",
+              commit_message="sync(ocei): daily cryptographic ledger snapshot from orbitcompute.ai",
+          )
+          for doc in ("README.md", "GOVERNANCE.md", "AUDIT_VERIFICATION.md"):
+              if os.path.exists(doc):
+                  api.upload_file(
+                      path_or_fileobj=doc,
+                      path_in_repo=doc,
+                      repo_id=repo_id,
+                      repo_type="dataset",
+                      commit_message=f"sync(ocei): update {doc}",
+                  )
+          print(f"Synced OCEI v2.3 ledger to https://huggingface.co/datasets/{repo_id}")
+          PY
