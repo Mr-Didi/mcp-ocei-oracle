@@ -3,6 +3,9 @@
 [![OCEI v2.3 Live Oracle](https://orbitcompute.ai/v1/index/ocei/badge.svg)](https://orbitcompute.ai/ocei)
 [![DOI](https://img.shields.io/badge/Zenodo%20DOI-10.5281%2Fzenodo.24181722-38bdf8.svg)](https://doi.org/10.5281/zenodo.24181722)
 [![Protocol](https://img.shields.io/badge/MCP%20%7C%20A2A%20%7C%20Prometheus-Zero--Auth-10b981.svg)](https://orbitcompute.ai/v1/openapi.json)
+[![mcp-ocei-oracle MCP server – quality and maintenance score on Glama](https://glama.ai/mcp/servers/Mr-Didi/mcp-ocei-oracle/badges/score.svg)](https://glama.ai/mcp/servers/Mr-Didi/mcp-ocei-oracle)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Mr-Didi/mcp-ocei-oracle/blob/main/notebooks/ocei_underwriting_audit.ipynb)
+[![1-Click Agent Connect](https://img.shields.io/badge/1--Click%20Connect-Grok%20%7C%20Claude%20%7C%20Codex%20%7C%20OpenClaw-f59e0b.svg)](https://orbitcompute.ai/connect)
 
 Official reference repository, cryptographic audit ledger, Kubernetes/KEDA manifests, and zero-dependency Python SDK for **[OrbitCompute.ai](https://orbitcompute.ai)** — the vendor-neutral, cryptographically attested (**RFC 8785 + ECDSA P-256**) control plane comparing orbital AI compute shells (`650 km Dawn-Dusk SSO`, `320 km Self-Cleaning VLEO`, `550 km LEO`, `1,500 km MEO`) against terrestrial utility grids.
 
