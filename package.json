@@ -1,7 +1,7 @@
 {
   "name": "mcp-ocei-oracle",
   "version": "2.3.0",
-  "description": "Official Model Context Protocol (MCP) server for the OCEI v2.3 (Orbital Compute Efficiency Index) physics, space-weather, Cloudflare D1 TWAP, and 3-hub live electricity arbitrage oracle.",
+  "description": "Official Model Context Protocol (MCP) server for the OCEI v2.3 (Orbital Compute Efficiency Index) physics, space-weather, Cloudflare D1 TWAP & $/MTok 3-hub live electricity arbitrage oracle.",
   "homepage": "https://orbitcompute.ai",
   "type": "module",
   "main": "index.mjs",
