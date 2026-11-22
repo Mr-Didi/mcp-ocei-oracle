@@ -7,7 +7,7 @@
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Mr-Didi/mcp-ocei-oracle/blob/main/notebooks/ocei_underwriting_audit.ipynb)
 [![1-Click Agent Connect](https://img.shields.io/badge/1--Click%20Connect-Grok%20%7C%20Claude%20%7C%20Codex%20%7C%20OpenClaw-f59e0b.svg)](https://orbitcompute.ai/connect)
 
-Official reference repository, cryptographic audit ledger, Kubernetes/KEDA manifests, and zero-dependency Python SDK for **[OrbitCompute.ai](https://orbitcompute.ai)** — the vendor-neutral, cryptographically attested (**RFC 8785 + ECDSA P-256**) control plane comparing orbital AI compute shells (`650 km Dawn-Dusk SSO`, `320 km Self-Cleaning VLEO`, `550 km LEO`, `1,500 km MEO`) against terrestrial utility grids.
+Official reference repository, cryptographic audit ledger, Kubernetes/KEDA manifests, and zero-dependency Python SDK for **[OrbitCompute.ai](https://orbitcompute.ai)** — the vendor-neutral, cryptographically attested (**RFC 8785 + ECDSA P-256**) control plane comparing orbital AI compute shells (`650 km Dawn-Dusk SSO`, `320 km Self-Cleaning VLEO`, `550 km LEO`, `1,500 km MEO`) against terrestrial utility grids with live $/MTok arbitrage.
 
 ## What Is New in `v2.3.0`
 - **Cloudflare D1 Empirical Persistence (`15m` Cron):** True empirical 60-minute settlement TWAP (`D1_EMPIRICAL_60M`) and rolling 30-day covenant availability at `GET /v1/telemetry/history`.
