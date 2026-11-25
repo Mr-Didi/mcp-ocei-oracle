@@ -1,93 +1,93 @@
 {
   "schema": "ocei.ledger.head.v1",
-  "sequence": 19,
-  "recorded_utc": "2026-11-25T13:31:58.045240Z",
+  "sequence": 20,
+  "recorded_utc": "2026-11-25T22:47:38.927316Z",
   "ledger_file": "ledger/2026-11.jsonl",
-  "prev_ledger_hash": "43d11337b63db71bfe5ee2984e138b156436bda5d2daa7d5d34e3701b2cbb4d9",
-  "ledger_entry_hash": "bad7f8fca5a80ba4bcd3f3fb644225cbeef3eeb47fef5b99df822a03970b00de",
-  "oracle_state_hash_sha256": "c12c1a5227d4b5fed6c46d8dfa3d4063c6f225351eb8f4abc4b206119c956861",
-  "raw_payload_sha256": "ad5689b30f2df068547a3d4655d3b07f9b50b593aeddc6342d610c7feae8220c",
+  "prev_ledger_hash": "bad7f8fca5a80ba4bcd3f3fb644225cbeef3eeb47fef5b99df822a03970b00de",
+  "ledger_entry_hash": "32e0f5b1759f371827b037f848b3e4ae1054e91319c2a93a5da82c56803b3fad",
+  "oracle_state_hash_sha256": "adaa279fe8aa03054259263e5704497771c8f9f5596a49419ed82bd5c7dcfeac",
+  "raw_payload_sha256": "3311b5a4fcb6ba38c3e42a02bdedcb122966e90cdd614f3ff2903a71cd67d469",
   "jwks_kid": "ocei-es256-global-v2.3",
   "summary": {
     "schema_version": "2.3.0",
-    "ocei_spot": 963.7,
+    "ocei_spot": 965.2,
     "ocei_structural": 975.3,
-    "ocei_twap_60m": 963.7,
+    "ocei_twap_60m": 965.6,
     "twap_60m_source": "D1_EMPIRICAL_60M",
-    "vleo_320km_score": 945.3,
+    "vleo_320km_score": 946.8,
     "terrestrial_tier4_score": 530,
-    "net_orbital_spread_bps": 433.7,
+    "net_orbital_spread_bps": 435.2,
     "breakeven_grid_usd_mwh": 28.41,
     "dispatch_signal": "ORBIT_PRIMARY",
     "dispatch_directive": "ROUTE_TO_ORBIT_DAWN_DUSK_SSO",
-    "confidence_score": 0.934,
-    "rolling_24h_mean_spot": 964.6368,
+    "confidence_score": 0.953,
+    "rolling_24h_mean_spot": 964.665,
     "space_weather": {
       "status": "NOMINAL_LIVE_NOAA_SWPC",
-      "observation_utc": "2026-11-25T13:24:00Z",
+      "observation_utc": "2026-11-25T22:42:00Z",
       "l1_lead_min": 57.5,
       "pre_emptive_trigger": false,
       "f10_7_sfu": 158,
-      "kp": 1.2,
-      "goes_proton_pfu": 0.22,
+      "kp": 0.8,
+      "goes_proton_pfu": 0.21,
       "goes_xray_class": "B1.5",
-      "net_availability_pct": 97.63
+      "net_availability_pct": 97.77
     },
     "live_terrestrial_spot_grids": {
       "ercot_texas": {
         "market": "ERCOT Texas (HB_HUBAVG)",
-        "source": "ercot.com/cdr",
-        "slot_utc": "2026-11-25T13:15:00Z",
-        "updated_utc": "2026-11-25T13:30:24Z",
-        "age_minutes": 17,
+        "source": "data.kardashevlabs.org",
+        "slot_utc": "2026-11-25T22:00:00Z",
+        "updated_utc": "2026-11-25T22:45:24Z",
+        "age_minutes": 48,
         "stale": false,
-        "price_usd_mwh": 30.44,
-        "price_native": 30.44,
+        "price_usd_mwh": 14.21,
+        "price_native": 14.21,
         "currency": "USD",
-        "multiple_vs_orbital_breakeven": 1.07,
-        "live_dispatch_signal": "ORBIT_PRIMARY"
+        "multiple_vs_orbital_breakeven": 0.5,
+        "live_dispatch_signal": "TERRESTRIAL_SPOT_ARBITRAGE"
       },
       "pjm_virginia": {
         "market": "PJM Northern Virginia (WESTERN HUB)",
         "source": "data.kardashevlabs.org",
-        "slot_utc": "2026-11-25T12:55:00Z",
-        "updated_utc": "2026-11-25T13:30:24Z",
-        "age_minutes": 37,
+        "slot_utc": "2026-11-25T21:55:00Z",
+        "updated_utc": "2026-11-25T22:45:24Z",
+        "age_minutes": 53,
         "stale": false,
-        "price_usd_mwh": 49.01,
-        "price_native": 49.01,
+        "price_usd_mwh": 106.51,
+        "price_native": 106.51,
         "currency": "USD",
-        "multiple_vs_orbital_breakeven": 1.73,
+        "multiple_vs_orbital_breakeven": 3.75,
         "live_dispatch_signal": "ORBIT_PRIMARY"
       },
       "epex_europe": {
         "market": "EPEX Spot Europe (DE-LU)",
         "source": "awattar.de/epex",
-        "slot_utc": "2026-11-25T13:00:00Z",
-        "updated_utc": "2026-11-25T13:30:24Z",
-        "age_minutes": 32,
+        "slot_utc": "2026-11-25T22:00:00Z",
+        "updated_utc": "2026-11-25T22:45:24Z",
+        "age_minutes": 48,
         "stale": false,
-        "price_usd_mwh": 278.36,
-        "price_native": 257.74,
+        "price_usd_mwh": 229.94,
+        "price_native": 212.91,
         "currency": "EUR",
-        "multiple_vs_orbital_breakeven": 9.8,
+        "multiple_vs_orbital_breakeven": 8.09,
         "live_dispatch_signal": "ORBIT_PRIMARY"
       }
     },
     "live_terrestrial_spot": {
       "market": "EPEX Spot Europe (DE-LU)",
       "source": "awattar.de/epex",
-      "slot_utc": "2026-11-25T13:00:00Z",
-      "price_eur_mwh": 257.74,
-      "price_usd_mwh_est": 278.36,
-      "multiple_vs_orbital_breakeven": 9.8
+      "slot_utc": "2026-11-25T22:00:00Z",
+      "price_eur_mwh": 212.91,
+      "price_usd_mwh_est": 229.94,
+      "multiple_vs_orbital_breakeven": 8.09
     },
     "covenant_triggers": {
       "storm_interruption_flag": false,
       "rolling_30d_availability_pct": 97.67,
       "cash_trap_threshold_pct": 90,
       "cash_trap_breached": false,
-      "d1_samples_30d": 438
+      "d1_samples_30d": 475
     }
   },
   "rolling_24h_spot_window": [
@@ -109,6 +109,7 @@
     964.5,
     965.9,
     968.0,
-    963.7
+    963.7,
+    965.2
   ]
 }
